@@ -2,19 +2,28 @@ package router
 
 import (
 	"github.com/gin-gonic/gin"
-	"github.com/yourusername/autoreach-backend/internal/handler"
+	"github.com/yourusername/autoreach-backend/internal/auth"
+	"github.com/yourusername/autoreach-backend/internal/message"
+	"github.com/yourusername/autoreach-backend/internal/dto/response"
 )
 
 func SetupRouter() *gin.Engine {
     r := gin.Default()
 
-    r.GET("/", func(c *gin.Context) {
-        c.JSON(200, gin.H{"message": "AutoReach backend is running"})
+    r.GET("/api/v1/health", func(c *gin.Context) {
+        response.JSON(c, 200, true, "AutoReach backend is running", nil)
     })
 
-    api := r.Group("/api")
+    authGroup := r.Group("/api/v1/auth")
     {
-        api.POST("/generate-message", handler.GenerateMessage)
+        authGroup.POST("/signup", auth.SignupHandler)
+        authGroup.POST("/login", auth.LoginHandler)
+    }
+
+    api := r.Group("/api/v1")
+    api.Use(auth.AuthMiddleware())
+    {
+        api.POST("/generate-message", message.GenerateMessageHandler)
     }
 
     return r

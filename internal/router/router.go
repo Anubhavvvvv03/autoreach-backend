@@ -4,7 +4,7 @@ import (
 	"github.com/gin-gonic/gin"
 	"github.com/yourusername/autoreach-backend/internal/auth"
 	"github.com/yourusername/autoreach-backend/internal/message"
-	"github.com/yourusername/autoreach-backend/pkg/response"
+	"github.com/yourusername/autoreach-backend/internal/dto/response"
 )
 
 func SetupRouter() *gin.Engine {

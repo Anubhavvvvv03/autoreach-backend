@@ -5,22 +5,13 @@ import (
 
 	"github.com/gin-gonic/gin"
 	"github.com/yourusername/autoreach-backend/internal/config"
-	"github.com/yourusername/autoreach-backend/pkg/response"
+	"github.com/yourusername/autoreach-backend/internal/dto/request"
+	"github.com/yourusername/autoreach-backend/internal/dto/response"
 )
 
-type SignupRequest struct {
-	Email    string `json:"email" binding:"required,email"`
-	Password string `json:"password" binding:"required,min=6"`
-	Name     string `json:"name"`
-}
-
-type LoginRequest struct {
-	Email    string `json:"email" binding:"required,email"`
-	Password string `json:"password" binding:"required,min=6"`
-}
 
 func SignupHandler(c *gin.Context) {
-	var req SignupRequest
+	var req request.SignupRequest
 	if err := c.ShouldBindJSON(&req); err != nil {
 		response.JSON(c, http.StatusBadRequest, false, err.Error(), nil)
 		return
@@ -51,14 +42,14 @@ func SignupHandler(c *gin.Context) {
 		return
 	}
 
-	response.JSON(c, http.StatusCreated, true, "User created successfully", gin.H{
-		"name":  user.Name,
-		"email": user.Email,
+	response.JSON(c, http.StatusCreated, true, "User created successfully", response.SignupResponse{
+		Name:  user.Name,
+		Email: user.Email,
 	})
 }
 
 func LoginHandler(c *gin.Context) {
-	var req LoginRequest
+	var req request.LoginRequest
 	if err := c.ShouldBindJSON(&req); err != nil {
 		response.JSON(c, http.StatusBadRequest, false, err.Error(), nil)
 		return
@@ -82,5 +73,8 @@ func LoginHandler(c *gin.Context) {
 		return
 	}
 
-	response.JSON(c, http.StatusOK, true, "Login successful", gin.H{"token": token})
+	response.JSON(c, http.StatusOK, true, "Login successful", response.LoginResponse{
+		Token: token,
+		Email: user.Email,
+	})
 }

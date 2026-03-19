@@ -4,6 +4,7 @@ import (
 	"bytes"
 	"strings"
 	"text/template"
+	"github.com/yourusername/autoreach-backend/internal/dto/request"
 
 	_ "embed"
 )
@@ -12,7 +13,7 @@ import (
 //go:embed templates/outreach.tmpl
 var outreachTemplate string
 
-func GenerateMessageService(req MessageRequest) (string, error) {
+func GenerateMessageService(req request.MessageRequest) (string, error) {
 	tmpl, err := template.New("outreach").Parse(outreachTemplate)
 	if err != nil {
 		return "", err

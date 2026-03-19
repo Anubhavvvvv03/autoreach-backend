@@ -1,8 +1,6 @@
 package response
 
-import (
-	"github.com/gin-gonic/gin"
-)
+import "github.com/gin-gonic/gin"
 
 type Response struct {
 	Success bool        `json:"success"`

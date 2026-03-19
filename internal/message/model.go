@@ -1,4 +1,4 @@
-package model
+package message
 
 type MessageRequest struct {
     JobTitle string   `json:"jobTitle" binding:"required"`

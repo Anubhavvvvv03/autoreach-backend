@@ -1,4 +1,4 @@
-package service
+package message
 
 import (
 	"bytes"
@@ -6,15 +6,13 @@ import (
 	"text/template"
 
 	_ "embed"
-
-	"github.com/yourusername/autoreach-backend/internal/model"
 )
 
 // Embed the template into the binary
 //go:embed templates/outreach.tmpl
 var outreachTemplate string
 
-func GenerateMessage(req model.MessageRequest) (string, error) {
+func GenerateMessageService(req MessageRequest) (string, error) {
 	tmpl, err := template.New("outreach").Parse(outreachTemplate)
 	if err != nil {
 		return "", err

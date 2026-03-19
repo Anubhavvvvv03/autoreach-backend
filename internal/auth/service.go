@@ -5,10 +5,10 @@ import (
 	"time"
 
 	"github.com/golang-jwt/jwt/v5"
+	"github.com/yourusername/autoreach-backend/internal/config"
 	"golang.org/x/crypto/bcrypt"
 )
 
-var jwtKey = []byte("your_secret_key") // Should be loaded from config in production
 
 type Claims struct {
 	UserID string `json:"user_id"`
@@ -39,13 +39,13 @@ func GenerateJWT(userID string, email string) (string, error) {
 	}
 
 	token := jwt.NewWithClaims(jwt.SigningMethodHS256, claims)
-	return token.SignedString(jwtKey)
+	return token.SignedString([]byte(config.AppConfig.JWTSecret))
 }
 
 func ValidateJWT(tokenStr string) (*Claims, error) {
 	claims := &Claims{}
 	token, err := jwt.ParseWithClaims(tokenStr, claims, func(token *jwt.Token) (interface{}, error) {
-		return jwtKey, nil
+		return []byte(config.AppConfig.JWTSecret), nil
 	})
 
 	if err != nil {

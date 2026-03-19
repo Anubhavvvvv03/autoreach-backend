@@ -10,7 +10,7 @@ import (
 func SetupRouter() *gin.Engine {
     r := gin.Default()
 
-    r.GET("/", func(c *gin.Context) {
+    r.GET("/api/v1/health", func(c *gin.Context) {
         response.JSON(c, 200, true, "AutoReach backend is running", nil)
     })
 
@@ -20,7 +20,7 @@ func SetupRouter() *gin.Engine {
         authGroup.POST("/login", auth.LoginHandler)
     }
 
-    api := r.Group("/api")
+    api := r.Group("/api/v1")
     api.Use(auth.AuthMiddleware())
     {
         api.POST("/generate-message", message.GenerateMessageHandler)

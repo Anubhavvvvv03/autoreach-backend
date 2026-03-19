@@ -9,14 +9,14 @@ import (
 
 
 func main() {
-    cfg := config.LoadConfig()
-    logger.Info("Starting AutoReach backend on port " + cfg.Port)
+    config.AppConfig = config.LoadConfig()
+    logger.Info("Starting AutoReach backend on port " + config.AppConfig.Port)
 
-    config.ConnectDB(cfg)
+    config.ConnectDB(config.AppConfig)
 
     // Run migrations
     config.DB.AutoMigrate(&auth.User{})
 
     r := router.SetupRouter()
-    r.Run(":" + cfg.Port)
+    r.Run(":" + config.AppConfig.Port)
 }

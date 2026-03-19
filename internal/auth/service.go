@@ -12,6 +12,7 @@ var jwtKey = []byte("your_secret_key") // Should be loaded from config in produc
 
 type Claims struct {
 	UserID string `json:"user_id"`
+	Email  string `json:"email"`
 	jwt.RegisteredClaims
 }
 
@@ -25,11 +26,14 @@ func CheckPasswordHash(password, hash string) bool {
 	return err == nil
 }
 
-func GenerateJWT(userID string) (string, error) {
-	expirationTime := time.Now().Add(90 * 24 * time.Hour)
+func GenerateJWT(userID string, email string) (string, error) {
+	now := time.Now()
+	expirationTime := now.Add(90 * 24 * time.Hour)
 	claims := &Claims{
 		UserID: userID,
+		Email:  email,
 		RegisteredClaims: jwt.RegisteredClaims{
+			IssuedAt:  jwt.NewNumericDate(now),
 			ExpiresAt: jwt.NewNumericDate(expirationTime),
 		},
 	}

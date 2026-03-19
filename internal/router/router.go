@@ -4,13 +4,14 @@ import (
 	"github.com/gin-gonic/gin"
 	"github.com/yourusername/autoreach-backend/internal/auth"
 	"github.com/yourusername/autoreach-backend/internal/message"
+	"github.com/yourusername/autoreach-backend/pkg/response"
 )
 
 func SetupRouter() *gin.Engine {
     r := gin.Default()
 
     r.GET("/", func(c *gin.Context) {
-        c.JSON(200, gin.H{"message": "AutoReach backend is running"})
+        response.JSON(c, 200, true, "AutoReach backend is running", nil)
     })
 
     authGroup := r.Group("/api/v1/auth")

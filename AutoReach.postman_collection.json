@@ -82,6 +82,160 @@
 			]
 		},
 		{
+			"name": "Profile",
+			"item": [
+				{
+					"name": "Get Profile",
+					"request": {
+						"auth": {
+							"type": "bearer",
+							"bearer": [
+								{
+									"key": "token",
+									"value": "{{jwtToken}}",
+									"type": "string"
+								}
+							]
+						},
+						"method": "GET",
+						"header": [],
+						"url": {
+							"raw": "{{baseUrl}}/profile",
+							"host": [
+								"{{baseUrl}}"
+							],
+							"path": [
+								"api",
+								"v1",
+								"profile"
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "Create Profile",
+					"request": {
+						"auth": {
+							"type": "bearer",
+							"bearer": [
+								{
+									"key": "token",
+									"value": "{{jwtToken}}",
+									"type": "string"
+								}
+							]
+						},
+						"method": "POST",
+						"header": [],
+						"body": {
+							"mode": "raw",
+							"raw": "{\n    \"skills\": [\"Go\", \"Gin\", \"PostgreSQL\"],\n    \"experience\": [\n        {\n            \"company_name\": \"Tech Corp\",\n            \"start_date\": \"2022-01-01\",\n            \"end_date\": \"2024-01-01\",\n            \"work_done\": \"Developed scalable backends\"\n        }\n    ],\n    \"projects\": [\n        {\n            \"name\": \"AutoReach\",\n            \"tech_stack\": \"Go, Gin, GORM\",\n            \"description\": \"Outreach automation tool\",\n            \"url\": \"https://github.com/example/autoreach\",\n            \"meta\": \"Personal project\"\n        }\n    ],\n    \"resume_raw\": \"Experienced backend developer...\",\n    \"meta\": \"Extra user info\"\n}",
+							"options": {
+								"raw": {
+									"language": "json"
+								}
+							}
+						},
+						"url": {
+							"raw": "{{baseUrl}}/profile",
+							"host": [
+								"{{baseUrl}}"
+							],
+							"path": [
+								"api",
+								"v1",
+								"profile"
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "Update Profile",
+					"request": {
+						"auth": {
+							"type": "bearer",
+							"bearer": [
+								{
+									"key": "token",
+									"value": "{{jwtToken}}",
+									"type": "string"
+								}
+							]
+						},
+						"method": "PUT",
+						"header": [],
+						"body": {
+							"mode": "raw",
+							"raw": "{\n    \"skills\": [\"Go\", \"Gin\", \"PostgreSQL\", \"Redis\"],\n    \"experience\": [\n        {\n            \"company_name\": \"Tech Corp\",\n            \"start_date\": \"2022-01-01\",\n            \"end_date\": \"2024-01-01\",\n            \"work_done\": \"Optimized database queries and API performance\"\n        }\n    ],\n    \"projects\": [\n        {\n            \"name\": \"AutoReach\",\n            \"tech_stack\": \"Go, Gin, GORM, Redis\",\n            \"description\": \"Advanced outreach automation tool\",\n            \"url\": \"https://github.com/example/autoreach\",\n            \"meta\": \"Featured project\"\n        }\n    ],\n    \"resume_raw\": \"Senior backend developer...\",\n    \"meta\": \"Updated user info\"\n}",
+							"options": {
+								"raw": {
+									"language": "json"
+								}
+							}
+						},
+						"url": {
+							"raw": "{{baseUrl}}/profile",
+							"host": [
+								"{{baseUrl}}"
+							],
+							"path": [
+								"api",
+								"v1",
+								"profile"
+							]
+						}
+					},
+					"response": []
+				}
+			]
+		},
+		{
+			"name": "Resume",
+			"item": [
+				{
+					"name": "Parse Resume",
+					"request": {
+						"auth": {
+							"type": "bearer",
+							"bearer": [
+								{
+									"key": "token",
+									"value": "{{jwtToken}}",
+									"type": "string"
+								}
+							]
+						},
+						"method": "POST",
+						"header": [],
+						"body": {
+							"mode": "raw",
+							"raw": "{\n    \"resume_raw\": \"Experienced Golang Developer with 3 years of experience in Gin and GORM...\"\n}",
+							"options": {
+								"raw": {
+									"language": "json"
+								}
+							}
+						},
+						"url": {
+							"raw": "{{baseUrl}}/resume/parse",
+							"host": [
+								"{{baseUrl}}"
+							],
+							"path": [
+								"api",
+								"v1",
+								"resume",
+								"parse"
+							]
+						}
+					},
+					"response": []
+				}
+			]
+		},
+		{
 			"name": "Message Generation",
 			"item": [
 				{

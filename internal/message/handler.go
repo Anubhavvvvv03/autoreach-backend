@@ -14,7 +14,8 @@ func GenerateMessageHandler(c *gin.Context) {
         return
     }
 
-    msg, err := GenerateMessageService(req)
+    userID := c.GetString("userID")
+    msg, err := GenerateMessageService(req, userID)
     if err != nil {
         response.JSON(c, http.StatusInternalServerError, false, err.Error(), nil)
         return

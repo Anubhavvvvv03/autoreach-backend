@@ -13,7 +13,7 @@ func init() {
 	config := zap.NewDevelopmentEncoderConfig()
 	config.EncodeTime = zapcore.TimeEncoderOfLayout("15:04:05") // Only HH:mm:ss
 	config.EncodeLevel = zapcore.CapitalColorLevelEncoder
-	config.CallerKey = "" // Remove caller information
+	config.CallerKey = "" 
 
 	core := zapcore.NewCore(
 		zapcore.NewConsoleEncoder(config),
@@ -26,6 +26,10 @@ func init() {
 
 func Info(msg string, fields ...zap.Field) {
 	Log.Info(msg, fields...)
+}
+
+func Warn(msg string, fields ...zap.Field) {
+	Log.Warn(msg, fields...)
 }
 
 func Error(msg string, err error, fields ...zap.Field) {

@@ -29,7 +29,8 @@ func SetupRouter() *gin.Engine {
         api.GET("/profile", profile.GetProfileHandler)
         api.POST("/profile", profile.CreateProfileHandler)
         api.PUT("/profile", profile.UpdateProfileHandler)
-        api.POST("/resume/parse", resume.ParseResumeHandler)
+        api.POST("/resume/upload", resume.UploadResumeHandler)
+        api.GET("/resume/:id", resume.GetResumeStatusHandler)
     }
 
     return r

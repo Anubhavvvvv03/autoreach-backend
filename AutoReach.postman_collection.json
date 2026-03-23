@@ -195,7 +195,7 @@
 			"name": "Resume",
 			"item": [
 				{
-					"name": "Parse Resume",
+					"name": "Upload Resume (PDF)",
 					"request": {
 						"auth": {
 							"type": "bearer",
@@ -210,16 +210,17 @@
 						"method": "POST",
 						"header": [],
 						"body": {
-							"mode": "raw",
-							"raw": "{\n    \"resume_raw\": \"Experienced Golang Developer with 3 years of experience in Gin and GORM...\"\n}",
-							"options": {
-								"raw": {
-									"language": "json"
+							"mode": "formdata",
+							"formdata": [
+								{
+									"key": "file",
+									"type": "file",
+									"src": ""
 								}
-							}
+							]
 						},
 						"url": {
-							"raw": "{{baseUrl}}/resume/parse",
+							"raw": "{{baseUrl}}/api/v1/resume/upload",
 							"host": [
 								"{{baseUrl}}"
 							],
@@ -227,7 +228,37 @@
 								"api",
 								"v1",
 								"resume",
-								"parse"
+								"upload"
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "Get Resume Status",
+					"request": {
+						"auth": {
+							"type": "bearer",
+							"bearer": [
+								{
+									"key": "token",
+									"value": "{{jwtToken}}",
+									"type": "string"
+								}
+							]
+						},
+						"method": "GET",
+						"header": [],
+						"url": {
+							"raw": "{{baseUrl}}/api/v1/resume/{{resumeId}}",
+							"host": [
+								"{{baseUrl}}"
+							],
+							"path": [
+								"api",
+								"v1",
+								"resume",
+								"{{resumeId}}"
 							]
 						}
 					},

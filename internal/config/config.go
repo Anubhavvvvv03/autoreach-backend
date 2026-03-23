@@ -2,6 +2,7 @@ package config
 
 import (
     "os"
+    "strings"
     "github.com/joho/godotenv"
     "github.com/yourusername/autoreach-backend/pkg/logger"
 )
@@ -20,6 +21,7 @@ type Config struct {
     AWSBucket      string
     AWSAccessKey   string
     AWSSecretKey   string
+    AllowedOrigins []string
 }
 
 var AppConfig *Config
@@ -48,5 +50,6 @@ func LoadConfig() *Config {
         AWSBucket:    os.Getenv("AWS_S3_BUCKET"),
         AWSAccessKey: os.Getenv("AWS_ACCESS_KEY_ID"),
         AWSSecretKey: os.Getenv("AWS_SECRET_ACCESS_KEY"),
+        AllowedOrigins: strings.Split(os.Getenv("ALLOWED_ORIGINS"), ","),
     }
 }

@@ -3,6 +3,7 @@ package main
 import (
 	"context"
 	"fmt"
+	"sync"
 
 	"github.com/yourusername/autoreach-backend/internal/config"
 	"github.com/yourusername/autoreach-backend/internal/resume"
@@ -29,25 +30,48 @@ func main() {
 
 	logger.Info(fmt.Sprintf("Found %d expired resumes", len(resumes)))
 
-	ctx := context.Background()
-	deleted := 0
-
-	for _, r := range resumes {
-		// Delete from S3
-		if err := storage.Client.Delete(ctx, r.S3Key); err != nil {
-			logger.Error(fmt.Sprintf("Failed to delete S3 object %s", r.S3Key), err)
-			continue
-		}
-
-		// Soft-delete DB record
-		if err := config.DB.Delete(&r).Error; err != nil {
-			logger.Error(fmt.Sprintf("Failed to delete DB record %s", r.ID), err)
-			continue
-		}
-
-		deleted++
-		logger.Info(fmt.Sprintf("Deleted resume: id=%s, s3_key=%s", r.ID, r.S3Key))
+	if len(resumes) == 0 {
+		logger.Info("No resumes to clean up.")
+		return
 	}
 
-	logger.Info(fmt.Sprintf("Cleanup complete. Deleted %d/%d resumes.", deleted, len(resumes)))
+	ctx := context.Background()
+	numWorkers := 5
+	jobs := make(chan resume.ResumeFile, len(resumes))
+	var wg sync.WaitGroup
+
+	// Start workers
+	for w := 1; w <= numWorkers; w++ {
+		wg.Add(1)
+		go func(workerID int) {
+			defer wg.Done()
+			for r := range jobs {
+				logger.Info(fmt.Sprintf("[Worker %d] Deleting resume: id=%s, s3_key=%s", workerID, r.ID, r.S3Key))
+
+				// Delete from S3
+				if err := storage.Client.Delete(ctx, r.S3Key); err != nil {
+					logger.Error(fmt.Sprintf("[Worker %d] Failed to delete S3 object %s", workerID, r.S3Key), err)
+					continue
+				}
+
+				// Soft-delete DB record
+				if err := config.DB.Delete(&r).Error; err != nil {
+					logger.Error(fmt.Sprintf("[Worker %d] Failed to delete DB record %s", workerID, r.ID), err)
+					continue
+				}
+				logger.Info(fmt.Sprintf("[Worker %d] Successfully deleted %s", workerID, r.ID))
+			}
+		}(w)
+	}
+
+	// Send jobs
+	for _, r := range resumes {
+		jobs <- r
+	}
+	close(jobs)
+
+	// Wait for all workers to complete
+	wg.Wait()
+
+	logger.Info("Cleanup process finished.")
 }

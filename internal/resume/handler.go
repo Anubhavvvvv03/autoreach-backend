@@ -1,6 +1,8 @@
 package resume
 
 import (
+	"context"
+	"encoding/json"
 	"fmt"
 	"net/http"
 	"path/filepath"
@@ -68,21 +70,22 @@ func UploadResumeHandler(c *gin.Context) {
 
 	logger.Info(fmt.Sprintf("Resume uploaded: id=%s, s3_key=%s", record.ID, s3Key))
 
-	// Trigger parsing pipeline synchronously
-	parsed, err := ProcessResume(c.Request.Context(), userID, record.ID, s3Key)
-	if err != nil {
-		logger.Error("Resume processing failed", err)
-		// Return the resume ID on failure so user can check status
-		response.JSON(c, http.StatusOK, false, "Resume uploaded but parsing failed: "+err.Error(), gin.H{
-			"resume_id": record.ID,
-			"status":    StatusFailed,
-		})
-		return
-	}
+	// Trigger parsing pipeline asynchronously
+	// context.Background() is used because the request context (c.Request.Context())
+	// will be cancelled as soon as this handler returns the 202 response.
+	go func() {
+		// Create a separate background context for the long-running task
+		ctx := context.Background()
+		_, err := ProcessResume(ctx, userID, record.ID, s3Key)
+		if err != nil {
+			logger.Error(fmt.Sprintf("Async resume processing failed for id=%s", record.ID), err)
+		}
+	}()
 
-	response.JSON(c, http.StatusOK, true, "Resume parsed successfully", gin.H{
-		"resume_id":   record.ID,
-		"parsed_data": parsed,
+	// Returns 202 Accepted immediately
+	response.JSON(c, http.StatusAccepted, true, "Resume uploaded and processing started", gin.H{
+		"resume_id": record.ID,
+		"status":    StatusPending,
 	})
 }
 
@@ -112,9 +115,16 @@ func GetResumeStatusHandler(c *gin.Context) {
 		return
 	}
 
+	var parsedData interface{}
+	if record.ParsedData != "" {
+		json.Unmarshal([]byte(record.ParsedData), &parsedData)
+	}
+
 	response.JSON(c, http.StatusOK, true, "Resume status fetched", gin.H{
-		"resume_id":  record.ID,
-		"status":     record.Status,
-		"created_at": record.CreatedAt,
+		"resume_id":   record.ID,
+		"status":      record.Status,
+		"parsed_data": parsedData,
+		"fail_reason": record.FailReason,
+		"created_at":  record.CreatedAt,
 	})
 }

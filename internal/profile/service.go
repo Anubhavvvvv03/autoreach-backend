@@ -32,10 +32,15 @@ func CreateProfile(userID string, req request.UpsertProfileRequest) (*response.P
 	}
 
 	p = Profile{
-		UserID:     userID,
-		Skills:     req.Skills,
-		ResumeRaw:  req.ResumeRaw,
-		Meta:       req.Meta,
+		UserID:      userID,
+		FullName:    req.FullName,
+		Title:       req.Title,
+		Bio:         req.Bio,
+		Location:    req.Location,
+		SocialLinks: SocialLinks(req.SocialLinks),
+		Skills:      req.Skills,
+		ResumeRaw:   req.ResumeRaw,
+		Meta:        req.Meta,
 	}
 
 	for _, e := range req.Experience {
@@ -71,6 +76,11 @@ func UpdateProfile(userID string, req request.UpsertProfileRequest) (*response.P
 		projects = append(projects, Project(pr))
 	}
 
+	p.FullName = req.FullName
+	p.Title = req.Title
+	p.Bio = req.Bio
+	p.Location = req.Location
+	p.SocialLinks = SocialLinks(req.SocialLinks)
 	p.Skills = req.Skills
 	p.Experience = experience
 	p.Projects = projects
@@ -96,12 +106,17 @@ func toProfileResponse(p Profile) *response.ProfileResponse {
 	}
 
 	return &response.ProfileResponse{
-		ID:         p.ID,
-		UserID:     p.UserID,
-		Skills:     p.Skills,
-		Experience: exp,
-		Projects:   proj,
-		ResumeRaw:  p.ResumeRaw,
-		Meta:       p.Meta,
+		ID:          p.ID,
+		UserID:      p.UserID,
+		FullName:    p.FullName,
+		Title:       p.Title,
+		Bio:         p.Bio,
+		Location:    p.Location,
+		SocialLinks: request.SocialLinksDTO(p.SocialLinks),
+		Skills:      p.Skills,
+		Experience:  exp,
+		Projects:    proj,
+		ResumeRaw:   p.ResumeRaw,
+		Meta:        p.Meta,
 	}
 }

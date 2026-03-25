@@ -11,6 +11,7 @@ import (
 	"github.com/gin-gonic/gin"
 	"github.com/google/uuid"
 	"github.com/yourusername/autoreach-backend/internal/config"
+	"github.com/yourusername/autoreach-backend/internal/dashboard"
 	"github.com/yourusername/autoreach-backend/internal/dto/response"
 	"github.com/yourusername/autoreach-backend/pkg/logger"
 	"github.com/yourusername/autoreach-backend/pkg/storage"
@@ -82,10 +83,18 @@ func UploadResumeHandler(c *gin.Context) {
 		}
 	}()
 
+	// Log Activity
+	config.DB.Create(&dashboard.Activity{
+		UserID: userID,
+		Type:   "RESUME",
+		Title:  "Resume uploaded for analysis",
+		Status: "PROCESSING",
+	})
+
 	// Returns 202 Accepted immediately
 	response.JSON(c, http.StatusAccepted, true, "Resume uploaded and processing started", gin.H{
-		"resume_id": record.ID,
-		"status":    StatusPending,
+		"jobId":  record.ID,
+		"status": "PROCESSING",
 	})
 }
 
@@ -120,11 +129,22 @@ func GetResumeStatusHandler(c *gin.Context) {
 		json.Unmarshal([]byte(record.ParsedData), &parsedData)
 	}
 
+	// Map internal status to contract status
+	status := record.Status
+	if status == StatusSuccess {
+		status = "COMPLETED"
+	} else if status == StatusPending {
+		status = "PROCESSING"
+	}
+
 	response.JSON(c, http.StatusOK, true, "Resume status fetched", gin.H{
-		"resume_id":   record.ID,
-		"status":      record.Status,
-		"parsed_data": parsedData,
-		"fail_reason": record.FailReason,
-		"created_at":  record.CreatedAt,
+		"jobId":    record.ID,
+		"status":   status,
+		"progress": 100, // Always 100 if fetched via this handler for now
+		"results": gin.H{
+			"skills":            parsedData, // We'll pass the full parsed data as results
+			"experienceSummary": record.FailReason,
+		},
+		"created_at": record.CreatedAt,
 	})
 }

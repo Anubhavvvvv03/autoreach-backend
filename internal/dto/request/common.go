@@ -14,3 +14,8 @@ type ExperienceDTO struct {
 	EndDate     string `json:"end_date"`
 	WorkDone    string `json:"work_done"`
 }
+
+type SocialLinksDTO struct {
+	LinkedIn string `json:"linkedin"`
+	GitHub   string `json:"github"`
+}

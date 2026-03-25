@@ -22,17 +22,27 @@ type Experience struct {
 	WorkDone    string `json:"work_done"`
 }
 
+type SocialLinks struct {
+	LinkedIn string `json:"linkedin"`
+	GitHub   string `json:"github"`
+}
+
 type Profile struct {
-	ID         string         `gorm:"type:uuid;primaryKey" json:"id"`
-	UserID     string         `gorm:"type:uuid;uniqueIndex;not null" json:"user_id"`
-	Skills     []string       `gorm:"serializer:json" json:"skills"`
-	Experience []Experience   `gorm:"serializer:json" json:"experience"`
-	Projects   []Project      `gorm:"serializer:json" json:"projects"`
-	ResumeRaw  string         `gorm:"type:text" json:"resume_raw"`
-	Meta       string         `gorm:"type:text" json:"meta"`
-	CreatedAt  time.Time      `json:"created_at"`
-	UpdatedAt  time.Time      `json:"updated_at"`
-	DeletedAt  gorm.DeletedAt `gorm:"index" json:"-"`
+	ID          string         `gorm:"type:uuid;primaryKey" json:"id"`
+	UserID      string         `gorm:"type:uuid;uniqueIndex;not null" json:"user_id"`
+	FullName    string         `json:"fullName"`
+	Title       string         `json:"title"`
+	Bio         string         `json:"bio"`
+	Location    string         `json:"location"`
+	SocialLinks SocialLinks    `gorm:"serializer:json" json:"socialLinks"`
+	Skills      []string       `gorm:"serializer:json" json:"skills"`
+	Experience  []Experience   `gorm:"serializer:json" json:"experience"`
+	Projects    []Project      `gorm:"serializer:json" json:"projects"`
+	ResumeRaw   string         `gorm:"type:text" json:"resume_raw"`
+	Meta        string         `gorm:"type:text" json:"meta"`
+	CreatedAt   time.Time      `json:"created_at"`
+	UpdatedAt   time.Time      `json:"updated_at"`
+	DeletedAt   gorm.DeletedAt `gorm:"index" json:"-"`
 }
 
 func (p *Profile) BeforeCreate(tx *gorm.DB) (err error) {

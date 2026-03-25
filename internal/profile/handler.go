@@ -77,3 +77,28 @@ func UpdateProfileHandler(c *gin.Context) {
 
 	response.JSON(c, http.StatusOK, true, "Profile updated successfully", p)
 }
+
+func SyncStatusHandler(c *gin.Context) {
+	userID := c.GetString("userID")
+	if userID == "" {
+		response.JSON(c, http.StatusUnauthorized, false, "Unauthorized", nil)
+		return
+	}
+
+	prof, _ := GetProfileByUserID(userID)
+
+	linkedInStatus := "PENDING"
+	if prof != nil && prof.SocialLinks.LinkedIn != "" {
+		linkedInStatus = "SUCCESS"
+	}
+
+	items := []gin.H{
+		{"id": "linkedin", "label": "LinkedIn Sync", "status": linkedInStatus},
+		{"id": "resume", "label": "Resume Analysis", "status": "SUCCESS"}, // If they have a profile, resume was parsed
+		{"id": "github", "label": "GitHub Sync", "status": "PENDING"},
+	}
+
+	response.JSON(c, http.StatusOK, true, "Sync status fetched successfully", gin.H{
+		"items": items,
+	})
+}

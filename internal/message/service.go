@@ -4,6 +4,8 @@ import (
 	"bytes"
 	"strings"
 	"text/template"
+
+	"github.com/yourusername/autoreach-backend/internal/config"
 	"github.com/yourusername/autoreach-backend/internal/dto/request"
 	"github.com/yourusername/autoreach-backend/internal/profile"
 
@@ -23,26 +25,49 @@ func GenerateMessageService(req request.MessageRequest, userID string) (string, 
 	// Fetch profile for additional context if available
 	prof, _ := profile.GetProfileByUserID(userID)
 
-	poster := req.Poster
-	job := req.JobTitle
 	var skills []string
-
-	if len(req.Skills) > 0 {
-		skills = req.Skills
-	} else if prof != nil {
+	if prof != nil {
 		skills = prof.Skills
 	}
 
 	data := map[string]interface{}{
-		"Poster": poster,
-		"Job":    job,
-		"Skills": strings.Join(skills, ", "),
+		"Recruiter": req.Recruiter,
+		"Role":      req.Role,
+		"Company":   req.Company,
+		"Tone":      req.Tone,
+		"Context":   req.Context,
+		"Skills":    strings.Join(skills, ", "),
 	}
 
-	var msg bytes.Buffer
-	if err := tmpl.Execute(&msg, data); err != nil {
+	var msgBuf bytes.Buffer
+	if err := tmpl.Execute(&msgBuf, data); err != nil {
 		return "", err
 	}
 
-	return msg.String(), nil
+	generatedText := msgBuf.String()
+
+	// Persist to history
+	msgRecord := Message{
+		UserID:    userID,
+		Company:   req.Company,
+		Role:      req.Role,
+		Recruiter: req.Recruiter,
+		Tone:      req.Tone,
+		Context:   req.Context,
+		Text:      generatedText,
+		Status:    "GENERATED",
+	}
+
+	config.DB.Create(&msgRecord)
+
+	return generatedText, nil
 }
+
+func GetMessageHistory(userID string) ([]Message, error) {
+	var messages []Message
+	if err := config.DB.Where("user_id = ?", userID).Order("created_at desc").Find(&messages).Error; err != nil {
+		return nil, err
+	}
+	return messages, nil
+}
+	

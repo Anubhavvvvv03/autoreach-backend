@@ -1,5 +1,7 @@
 package response
 
 type MessageResponse struct {
-	Message string `json:"message"`
+	MessageID   string `json:"messageId"`
+	Text        string `json:"text"`
+	GeneratedAt string `json:"generatedAt"`
 }

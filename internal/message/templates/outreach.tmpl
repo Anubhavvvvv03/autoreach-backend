@@ -1,6 +1,7 @@
-Hi {{.Poster}},
+Hi {{.Recruiter}},
 
-I am interested in the {{.Job}} role. 
+I am interested in the {{.Role}} role at {{.Company}}. 
 I have experience in {{.Skills}}.
+{{if .Context}}More specifically: {{.Context}}{{end}}
 
 Looking forward to connecting!

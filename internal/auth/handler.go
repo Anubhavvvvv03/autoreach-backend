@@ -33,7 +33,7 @@ func SignupHandler(c *gin.Context) {
 	user := User{
 		Email:    req.Email,
 		Password: hashedPassword,
-		Name:     req.Name,
+		FullName: req.FullName,
 	}
 
 	result := config.DB.Create(&user)
@@ -42,9 +42,19 @@ func SignupHandler(c *gin.Context) {
 		return
 	}
 
+	token, err := GenerateJWT(user.ID, user.Email)
+	if err != nil {
+		response.JSON(c, http.StatusInternalServerError, false, "Failed to generate token", nil)
+		return
+	}
+
 	response.JSON(c, http.StatusCreated, true, "User created successfully", response.SignupResponse{
-		Name:  user.Name,
-		Email: user.Email,
+		Token: token,
+		User: response.UserResponse{
+			ID:       user.ID,
+			Email:    user.Email,
+			FullName: user.FullName,
+		},
 	})
 }
 
@@ -75,6 +85,32 @@ func LoginHandler(c *gin.Context) {
 
 	response.JSON(c, http.StatusOK, true, "Login successful", response.LoginResponse{
 		Token: token,
-		Email: user.Email,
+		User: response.UserResponse{
+			ID:        user.ID,
+			Email:     user.Email,
+			FullName:  user.FullName,
+			AvatarUrl: user.AvatarUrl,
+		},
+	})
+}
+
+func MeHandler(c *gin.Context) {
+	userID, exists := c.Get("userID")
+	if !exists {
+		response.JSON(c, http.StatusUnauthorized, false, "Unauthorized", nil)
+		return
+	}
+
+	var user User
+	if err := config.DB.First(&user, "id = ?", userID).Error; err != nil {
+		response.JSON(c, http.StatusNotFound, false, "User not found", nil)
+		return
+	}
+
+	response.JSON(c, http.StatusOK, true, "User fetched successfully", response.UserResponse{
+		ID:        user.ID,
+		Email:     user.Email,
+		FullName:  user.FullName,
+		AvatarUrl: user.AvatarUrl,
 	})
 }

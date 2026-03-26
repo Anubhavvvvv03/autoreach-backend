@@ -1,7 +1,9 @@
 package request
 
 type MessageRequest struct {
-	JobTitle string   `json:"jobTitle" binding:"required"`
-	Poster   string   `json:"poster" binding:"required"`
-	Skills   []string `json:"skills" binding:"required"`
+	Company   string `json:"company" binding:"required"`
+	Role      string `json:"role" binding:"required"`
+	Recruiter string `json:"recruiter" binding:"required"`
+	Tone      string `json:"tone"`
+	Context   string `json:"context"`
 }
